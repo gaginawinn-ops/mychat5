@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyChat - Privacy First Messaging</title>
+    <!-- Tailwind CSS for Modern Responsive UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for WhatsApp-style Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Anti-Save CSS Protections */
+        .anti-save {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: none;
+        }
+        /* Scrollbar styling for smooth chat experience */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans h-screen flex flex-col overflow-hidden">
+
+    <!-- ========================================== -->
+    <!-- 1. LOGIN SCREEN -->
+    <!-- ========================================== -->
+    <div id="login-screen" class="flex-1 flex flex-col justify-center items-center bg-slate-900 text-white">
+        <div class="bg-slate-800 p-10 rounded-2xl shadow-2xl text-center max-w-sm w-full mx-4 border border-slate-700">
+            <div class="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-lg">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h1 class="text-3xl font-extrabold mb-2 tracking-tight">MyChat</h1>
+            <p class="text-slate-400 text-sm mb-8">Secure, Anonymous & Real-time Messaging Platform</p>
+            
+            <button id="btn-login" class="w-full bg-white text-slate-900 font-bold py-3 px-4 rounded-xl transition duration-300 hover:bg-slate-200 flex items-center justify-center gap-3 text-lg shadow-md">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/provider/google.svg" class="w-6 h-6" alt="Google">
+                Sign in with Gmail
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. ONBOARDING / PROFILE SETUP SCREEN -->
+    <!-- ========================================== -->
+    <div id="setup-screen" class="hidden flex-1 flex flex-col justify-center items-center bg-slate-900 text-white">
+        <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-slate-700">
+            <h2 class="text-2xl font-bold mb-2 text-emerald-400"><i class="fa-solid fa-user-gear mr-2"></i>Setup Profile</h2>
+            <p class="text-slate-400 text-xs mb-6">Hide your real identity. Pick an avatar, anonymous username, and enter your age.</p>
+            
+            <form id="setup-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Select Avatar</label>
+                    <div class="flex justify-around gap-2 p-2 bg-slate-950 rounded-xl">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="avatar" value="ninja" checked class="hidden peer">
+                            <div class="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center text-xl border-2 border-transparent peer-checked:border-white peer-checked:scale-110 transition"><i class="fa-solid fa-user-ninja"></i></div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="avatar" value="astronaut" class="hidden peer">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-xl border-2 border-transparent peer-checked:border-white peer-checked:scale-110 transition"><i class="fa-solid fa-user-astronaut"></i></div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="avatar" value="secret" class="hidden peer">
+                            <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-xl border-2 border-transparent peer-checked:border-white peer-checked:scale-110 transition"><i class="fa-solid fa-user-secret"></i></div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="avatar" value="ghost" class="hidden peer">
+                            <div class="w-12 h-12 bg-amber-600 rounded-full flex items-center justify-center text-xl border-2 border-transparent peer-checked:border-white peer-checked:scale-110 transition"><i class="fa-solid fa-ghost"></i></div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Anonymous Username</label>
+                    <input type="text" id="setup-username" required placeholder="e.g., ShadowRider" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Your Age</label>
+                    <input type="number" id="setup-age" required min="10" max="100" placeholder="e.g., 22" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">About Status</label>
+                    <input type="text" id="setup-status" value="Hey there! I am using MyChat." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-500 text-slate-900 font-bold py-3 rounded-xl hover:bg-emerald-400 transition shadow-lg text-lg">
+                    Complete Setup & Create ID
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. MAIN DASHBOARD SCREEN (WHATSAPP LAYOUT) -->
+    <!-- ========================================== -->
+    <div id="main-dashboard" class="hidden flex-1 flex h-screen overflow-hidden bg-slate-950">
+        
+        <!-- SIDEBAR (LEFT COLUMN) -->
+        <div class="w-full md:w-80 lg:w-96 bg-slate-900 border-r border-slate-800 flex flex-col h-full shrink-0">
+            <!-- User Profile Header -->
+            <div class="p-4 bg-slate-950 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div id="my-avatar-display" class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white text-lg font-bold"></div>
+                    <div>
+                        <h3 id="my-username-display" class="text-white font-bold text-sm">Username</h3>
+                        <p id="my-id-display" class="text-emerald-400 text-xs font-mono">ID: 0000000000</p>
+                    </div>
+                </div>
+                <button id="btn-logout" class="text-slate-400 hover:text-rose-500 transition text-lg p-2" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="flex bg-slate-950 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
+                <button id="tab-chats" class="flex-1 py-3 text-center border-b-2 border-emerald-500 text-emerald-400 transition">Chats</button>
+                <button id="tab-groups" class="flex-1 py-3 text-center border-b-2 border-transparent hover:text-white transition">Groups</button>
+                <button id="tab-social" class="flex-1 py-3 text-center border-b-2 border-transparent hover:text-white transition">Add / Requests</button>
+            </div>
+
+            <!-- Scrollable Content Panels -->
+            <div class="flex-1 overflow-y-auto p-2 space-y-1">
+                <!-- CHATS PANEL -->
+                <div id="panel-chats" class="space-y-1">
+                    <p class="text-xs text-slate-500 p-2 italic text-center">No active chats. Add friends using their 10-digit ID!</p>
+                </div>
+
+                <!-- GROUPS PANEL -->
+                <div id="panel-groups" class="hidden space-y-3">
+                    <div class="p-2 space-y-2">
+                        <button id="btn-open-create-group" class="w-full bg-emerald-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-emerald-500 transition"><i class="fa-solid fa-plus mr-1"></i> Create Group</button>
+                        <button id="btn-open-join-group" class="w-full bg-slate-800 text-slate-300 font-bold py-2 rounded-lg text-xs hover:bg-slate-700 transition border border-slate-700"><i class="fa-solid fa-right-to-bracket mr-1"></i> Join with Code</button>
+                    </div>
+                    <hr class="border-slate-800 mx-2">
+                    <div id="groups-list" class="space-y-1 p-1"></div>
+                </div>
+
+                <!-- SOCIAL / FRIEND SYSTEM PANEL -->
+                <div id="panel-social" class="hidden space-y-4 p-2">
+                    <!-- Send Request -->
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <h4 class="text-white font-bold text-xs mb-2 uppercase tracking-wide text-emerald-400">Add Friend by ID</h4>
+                        <div class="flex gap-2">
+                            <input type="text" id="input-friend-id" maxlength="10" placeholder="10-digit Number ID" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none">
+                            <button id="btn-send-request" class="bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold px-3 rounded-lg text-xs transition">Send</button>
+                        </div>
+                    </div>
+                    <!-- Requests Lists -->
+                    <div>
+                        <h4 class="text-slate-400 font-bold text-xs mb-2 uppercase tracking-wide">Pending Requests</h4>
+                        <div id="friend-requests-list" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHATS WINDOW (RIGHT COLUMN) -->
+        <div id="chat-window-placeholder" class="flex-1 flex flex-col justify-center items-center text-slate-500 bg-slate-950 p-4">
+            <div class="text-center">
+                <i class="fa-solid fa-comments text-6xl mb-4 text-slate-800"></i>
+                <h3 class="text-xl font-bold text-slate-400">MyChat Workspace</h3>
+                <p class="text-xs max-w-xs mx-auto mt-1 text-slate-500">Select an existing chat, group, or add a friend using their unique 10-digit code to start chatting securely.</p>
+            </div>
+        </div>
+
+        <!-- ACTIVE CHAT WINDOW -->
+        <div id="chat-window-active" class="hidden flex-1 flex flex-col h-full bg-slate-950">
+            <!-- Active Chat Header -->
+            <div class="p-3 bg-slate-900 flex items-center justify-between border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div id="active-avatar" class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold"></div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 id="active-title" class="text-white font-bold text-sm">Active Room</h3>
+                            <span id="active-age-badge" class="bg-slate-800 text-slate-400 text-[10px] px-1.5 py-0.5 rounded font-bold hidden">Age: --</span>
+                        </div>
+                        <p id="active-status" class="text-slate-400 text-xs truncate max-w-xs">Offline</p>
+                    </div>
+                </div>
+                <div id="active-meta-actions" class="text-slate-400 text-xs font-mono"></div>
+            </div>
+
+            <!-- Messages Stream -->
+            <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-950"></div>
+
+            <!-- Typing Indicator Area -->
+            <div id="typing-indicator" class="px-4 py-1 text-xs text-emerald-400 italic bg-slate-950 hidden">
+                <span id="typing-text">Someone is typing...</span>
+            </div>
+
+            <!-- Message Input Form -->
+            <div class="p-3 bg-slate-900 border-t border-slate-800 shrink-0">
+                <form id="message-form" class="flex items-center gap-2">
+                    <!-- Photo Trigger Hidden Input -->
+                    <label class="cursor-pointer p-2 text-slate-400 hover:text-emerald-400 transition" title="Share Anti-Save Photo">
+                        <i class="fa-solid fa-image text-xl"></i>
+                        <input type="file" id="input-photo" accept="image/*" class="hidden">
+                    </label>
+                    <input type="text" id="input-message" autocomplete="off" placeholder="Type a secure message..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                    <button type="submit" class="bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold p-3 rounded-xl transition w-12 h-12 flex items-center justify-center text-lg shadow-md">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for Group Management -->
+    <!-- Create Group Modal -->
+    <div id="modal-create-group" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 p-6 rounded-2xl w-full max-w-sm border border-slate-700 text-white">
+            <h3 class="text-lg font-bold mb-3 text-emerald-400"><i class="fa-solid fa-users mr-1"></i> Create New Chat Group</h3>
+            <input type="text" id="input-group-name" placeholder="Group Name" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white mb-4 focus:outline-none">
+            <div class="flex gap-2 justify-end">
+                <button id="btn-close-create" class="bg-slate-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-600 transition">Cancel</button>
+                <button id="btn-confirm-create-group" class="bg-emerald-500 text-slate-900 px-4 py-2 rounded-xl text-sm font-bold hover:bg-emerald-400 transition">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join Group Modal -->
+    <div id="modal-join-group" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 p-6 rounded-2xl w-full max-w-sm border border-slate-700 text-white">
+            <h3 class="text-lg font-bold mb-3 text-emerald-400"><i class="fa-solid fa-right-to-bracket mr-1"></i> Join Group by Invite Code</h3>
+            <input type="text" id="input-group-code" placeholder="Enter 6-Digit Code" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-center font-mono tracking-widest text-white mb-4 focus:outline-none">
+            <div class="flex gap-2 justify-end">
+                <button id="btn-close-join" class="bg-slate-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-600 transition">Cancel</button>
+                <button id="btn-confirm-join-group" class="bg-emerald-500 text-slate-900 px-4 py-2 rounded-xl text-sm font-bold hover:bg-emerald-400 transition">Join Group</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 4. FIREBASE ENGINE & BACKEND CORE APPLICATION LOGIC -->
+    <!-- ========================================== -->
+    <script type="module">
+        // Importing standard Modular Firebase SDK distributions via official CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, where, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
+
+        // Your authenticated safe configuration parameters mapping out your production environment database nodes
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmWyEQI5V1mVq4sV0c3ap08TwLQOqAcuc",
+            authDomain: "ms-shops-5db4c.firebaseapp.com",
+            projectId: "ms-shops-5db4c",
+            storageBucket: "ms-shops-5db4c.firebasestorage.app",
+            messagingSenderId: "981166534138",
+            appId: "1:981166534138:web:9fefe68b8088fd1ab54843",
+            measurementId: "G-4VFJ1BK5V1"
+        };
+
+        // Initialize engine connections
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Application State Engine Scopes
+        let currentUser = null;       // Populated with global auth object
+        let myChatProfile = null;     // Populated with Firestore Profile Object
+        let activeRoomId = null;      // State of focused viewport chat tracking pointer ID
+        let activeRoomType = "";      // "private" OR "group" contextual flags
+        let activeRoomData = null;    // Remembers current metadata dictionary for permissions validation
+        let unsubMessages = null;     // Clears previous message pipeline configurations cleanly 
+        let typingTimeout = null;     // Debounces typing triggers gracefully 
+
+        // DOM Mapping Matrix
+        const screens = {
+            login: document.getElementById('login-screen'),
+            setup: document.getElementById('setup-screen'),
+            dashboard: document.getElementById('main-dashboard')
+        };
+
+        // Screen state presentation dynamic engine routing helper rules
+        function showScreen(screenKey) {
+            Object.keys(screens).forEach(key => {
+                if(key === screenKey) {
+                    screens[key].classList.remove('hidden');
+                } else {
+                    screens[key].classList.add('hidden');
+                }
+            });
+        }
+
+        // Return descriptive avatar symbols icon trees mapping configuration constants
+        function getAvatarIcon(key) {
+            switch(key) {
+                case 'ninja': return '<i class="fa-solid fa-user-ninja"></i>';
+                case 'astronaut': return '<i class="fa-solid fa-user-astronaut"></i>';
+                case 'secret': return '<i class="fa-solid fa-user-secret"></i>';
+                case 'ghost': return '<i class="fa-solid fa-ghost"></i>';
+                default: return '<i class="fa-solid fa-user"></i>';
+            }
+        }
+
+        // ==========================================
+        // IDENTITY PIPELINE GENERATORS (10-Digit Unique IDs)
+        // ==========================================
+        async function generateUniqueNumericId() {
+            let attempts = 0;
+            while (attempts < 10) {
+                let generatedId = "";
+                // Generate absolute 10-digit numeric sequence strings explicitly loops
+                for(let i=0; i<10; i++) {
+                    generatedId += Math.floor(Math.random() * 10).toString();
+                }
+                
+                // Assert structural state collisions inside Firestore global tables namespaces mapping out identities
+                const q = query(collection(db, "users"), where("numericId", "==", generatedId));
+                const snap = await getDoc(doc(db, "users_lookup", generatedId)); // optimized lookup row architectures
+                
+                if (!snap.exists()) {
+                    return generatedId;
+                }
+                attempts++;
+            }
+            return Date.now().toString().substring(3, 13); // Failover timestamp extraction mechanism
+        }
+
+        // Random code builder helpers for secure groups invitation tokens
+        function generateGroupInviteCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString(); // Generates 6-Digit clean numeric string tokens
+        }
+
+        // ==========================================
+        // AUTHENTICATION STATE OBSERVER MANAGEMENTS
+        // ==========================================
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                // Fetch existing database profiling tables using authentic UID references explicitly mappings
+                const profileRef = doc(db, "users", user.uid);
+                const profileSnap = await getDoc(profileRef);
+
+                if (profileSnap.exists()) {
+                    myChatProfile = profileSnap.data();
+                    // Sync online status dynamically directly upon successful handshake confirmation matching
+                    await updateDoc(profileRef, { statusState: "online", lastSeen: "Online" });
+                    setupDashboardUI();
+                    showScreen('dashboard');
+                } else {
+                    // Direct new profile setups instantly route safely
+                    showScreen('setup');
+                }
+            } else {
+                currentUser = null;
+                myChatProfile = null;
+                showScreen('login');
+            }
+        });
+
+        // Trigger Google Firebase authentication routing configurations pipelines
+        document.getElementById('btn-login').addEventListener('click', async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+            } catch (err) {
+                alert("Google Sign-In Failed: " + err.message);
+            }
+        });
+
+        // Signout routing processing triggers cleanups cleanly
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            if(myChatProfile) {
+                const profileRef = doc(db, "users", currentUser.uid);
+                await updateDoc(profileRef, { statusState: "offline", lastSeen: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+            }
+            if(unsubMessages) unsubMessages();
+            await signOut(auth);
+        });
+
+        // Profile Form Setup submission intercept pipeline rules execution mapping configurations
+        document.getElementById('setup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const usernameInput = document.getElementById('setup-username').value.trim();
+            const ageInput = document.getElementById('setup-age').value.trim();
+            const statusInput = document.getElementById('setup-status').value.trim();
+            const avatarInput = document.querySelector('input[name="avatar"]:checked').value;
+
+            if(!usernameInput || !ageInput) return alert("Please fill out all identity credentials rules fields correctly.");
+
+            try {
+                const generatedNumericId = await generateUniqueNumericId();
+                const profileData = {
+                    uid: currentUser.uid,
+                    numericId: generatedNumericId,
+                    username: usernameInput,
+                    age: parseInt(ageInput),
+                    aboutStatus: statusInput,
+                    avatar: avatarInput,
+                    statusState: "online",
+                    lastSeen: "Online"
+                };
+
+                // Store Primary Profile Record configuration documents safely inside storage nodes mapping structures
+                await setDoc(doc(db, "users", currentUser.uid), profileData);
+                // Reserve numeric key rows strictly inside lookup indexes arrays architectures maps to bypass structural scanning processes
+                await setDoc(doc(db, "users_lookup", generatedNumericId), { uid: currentUser.uid });
+
+                myChatProfile = profileData;
+                setupDashboardUI();
+                showScreen('dashboard');
+            } catch(err) {
+                alert("Error configuring secure profile layer structural namespaces: " + err.message);
+            }
+        });
+
+
+        // ==========================================
+        // TAB CONTROLLER UI ACTIONS MANAGEMENTS
+        // ==========================================
+        const tabButtons = {
+            chats: document.getElementById('tab-chats'),
+            groups: document.getElementById('tab-groups'),
+            social: document.getElementById('tab-social')
+        };
+        const panels = {
+            chats: document.getElementById('panel-chats'),
+            groups: document.getElementById('panel-groups'),
+            social: document.getElementById('panel-social')
+        };
+
+        function switchTab(activeKey) {
+            Object.keys(panels).forEach(key => {
+                if(key === activeKey) {
+                    panels[key].classList.remove('hidden');
+                    tabButtons[key].classList.add('border-emerald-500', 'text-emerald-400');
+                    tabButtons[key].classList.remove('border-transparent');
+                } else {
+                    panels[key].classList.add('hidden');
+                    tabButtons[key].classList.remove('border-emerald-500', 'text-emerald-400');
+                    tabButtons[key].classList.add('border-transparent');
+                }
+            });
+        }
+        tabButtons.chats.addEventListener('click', () => switchTab('chats'));
+        tabButtons.groups.addEventListener('click', () => switchTab('groups'));
+        tabButtons.social.addEventListener('click', () => switchTab('social'));
+
+
+        // ==========================================
+        // SOCIAL LAYER INTERACTION RULES ENGINE (FRIEND ENGINE)
+        // ==========================================
+        document.getElementById('btn-send-request').addEventListener('click', async () => {
+            const targetId = document.getElementById('input-friend-id').value.trim();
+            if(targetId === myChatProfile.numericId) return alert("You cannot send friend requests to your own numeric identity node.");
+            if(targetId.length !== 10 || isNaN(targetId)) return alert("Please enter a valid 10-digit number sequence representation.");
+
+            try {
+                const lookupSnap = await getDoc(doc(db, "users_lookup", targetId));
+                if(!lookupSnap.exists()) return alert("The target user identity matrix does not match any current accounts inside MyChat.");
+
+                const targetUid = lookupSnap.data().uid;
+                const requestKey = myChatProfile.numericId + "_" + targetId;
+
+                // Enforce unidirectional checking rules before writing requests objects configurations
+                await setDoc(doc(db, "friend_requests", requestKey), {
+                    senderId: myChatProfile.numericId,
+                    senderUid: currentUser.uid,
+                    senderUsername: myChatProfile.username,
+                    senderAvatar: myChatProfile.avatar,
+                    receiverId: targetId,
+                    receiverUid: targetUid,
+                    status: "pending",
+                    timestamp: Date.now()
+                });
+
+                alert("Friend request broadcasted successfully to numeric key: " + targetId);
+                document.getElementById('input-friend-id').value = "";
+            } catch(err) {
+                alert("Pipeline transaction fault error matching records: " + err.message);
+            }
+        });
+
+
+        // ==========================================
+        // CORE DASHBOARD PIPELINE SYNCHRONIZATION 
+        // ==========================================
+        function setupDashboardUI() {
+            document.getElementById('my-avatar-display').innerHTML = getAvatarIcon(myChatProfile.avatar);
+            document.getElementById('my-username-display').innerText = myChatProfile.username;
+            document.getElementById('my-id-display').innerText = "ID: " + myChatProfile.numericId;
+
+            // Initialize Dynamic Real-time Observation Streams Queries
+            syncFriendRequests();
+            syncFriendsListAndChats();
+            syncGroupsList();
+        }
+
+        // Live listening logic tracking incoming active friend request signals loops
+        function syncFriendRequests() {
+            const container = document.getElementById('friend-requests-list');
+            const q = query(collection(db, "friend_requests"), where("receiverId", "==", myChatProfile.numericId), where("status", "==", "pending"));
+            
+            onSnapshot(q, (snapshot) => {
+                container.innerHTML = "";
+                if(snapshot.empty) {
+                    container.innerHTML = '<p class="text-xs text-slate-600 italic">No incoming connection logs pending matching inputs.</p>';
+                    return;
+                }
+                snapshot.forEach((docSnap) => {
+                    const req = docSnap.data();
+                    const div = document.createElement('div');
+                    div.className = "bg-slate-900 p-2 rounded-lg flex items-center justify-between border border-slate-800 text-xs text-white";
+                    div.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs text-white">${getAvatarIcon(req.senderAvatar)}</div>
+                            <div>
+                                <span class="font-bold block">${req.senderUsername}</span>
+                                <span class="text-[10px] text-slate-500 font-mono">ID: ${req.senderId}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1">
+                            <button class="bg-emerald-500 hover:bg-emerald-400 text-slate-900 px-2 py-1 rounded font-bold transition action-accept" data-id="${docSnap.id}">Accept</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+
+                // Attach binding click operations hooks rules dynamically arrays processing loops maps
+                document.querySelectorAll('.action-accept').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const targetDocId = e.target.getAttribute('data-id');
+                        await acceptFriendRequestTransaction(targetDocId);
+                    });
+                });
+            });
+        }
+
+        async function acceptFriendRequestTransaction(docId) {
+            try {
+                const reqRef = doc(db, "friend_requests", docId);
+                const reqSnap = await getDoc(reqRef);
+                if(!reqSnap.exists()) return;
+
+                const data = reqSnap.data();
+                
+                // Initialize active established relationships schemas configurations row variables map objects
+                const chatRoomId = [data.senderId, data.receiverId].sort().join("_");
+                
+                // Record parameters maps inside private pairing matrixes documents entries
+                await setDoc(doc(db, "chats_active", chatRoomId), {
+                    roomId: chatRoomId,
+                    partyANumericId: data.senderId,
+                    partyAUid: data.senderUid,
+                    partyAName: data.senderUsername,
+                    partyAAvatar: data.senderAvatar,
+                    partyBNumericId: data.receiverId,
+                    partyBUid: data.receiverUid,
+                    partyBName: myChatProfile.username,
+                    partyBAvatar: myChatProfile.avatar,
+                    establishedTimestamp: Date.now()
+                });
+
+                // Resolve matching documentation rules inside base tables cleanly 
+                await updateDoc(reqRef, { status: "accepted" });
+                // Wipe structural document history rows cleanly to secure table space
+                await deleteDoc(reqRef);
+                alert("Secure direct peer routing channel connected successfully!");
+            } catch(err) {
+                alert("Error negotiating transaction handshake rules validation parameters: " + err.message);
+            }
+        }
+
+        // Keep direct contacts rendering lists running under real-time synchronization pipelines dynamically maps
+        function syncFriendsListAndChats() {
+            const container = document.getElementById('panel-chats');
+            const q1 = query(collection(db, "chats_active"), where("partyANumericId", "==", myChatProfile.numericId));
+            const q2 = query(collection(db, "chats_active"), where("partyBNumericId", "==", myChatProfile.numericId));
+
+            // Callback matching parameters updating views rows
+            const updateUI = (snaps) => {
+                container.innerHTML = "";
+                if(snaps.length === 0) {
+                    container.innerHTML = '<p class="text-xs text-slate-600 italic text-center p-4">No active connection logs found. Share your numeric key string coordinates.</p>';
+                    return;
+                }
+
+                snaps.forEach(chat => {
+                    const isPartyA = chat.partyANumericId === myChatProfile.numericId;
+                    const peerId = isPartyA ? chat.partyBNumericId : chat.partyANumericId;
+                    const peerUid = isPartyA ? chat.partyBUid : chat.partyAUid;
+                    const peerName = isPartyA ? chat.partyBName : chat.partyAName;
+                    const peerAvatar = isPartyA ? chat.partyBAvatar : chat.partyAAvatar;
+
+                    const div = document.createElement('div');
+                    div.className = "p-3 bg-slate-900 hover:bg-slate-800 rounded-xl flex items-center gap-3 cursor-pointer transition border border-slate-800/50 user-chat-row";
+                    div.setAttribute('data-room-id', chat.roomId);
+                    div.setAttribute('data-peer-uid', peerUid);
+                    div.setAttribute('data-peer-id', peerId);
+                    div.setAttribute('data-peer-name', peerName);
+                    div.setAttribute('data-peer-avatar', peerAvatar);
+
+                    div.innerHTML = `
+                        <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-white relative">
+                            ${getAvatarIcon(peerAvatar)}
+                            <div class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-900 bg-slate-500 indicator-${peerUid}"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-baseline">
+                                <h4 class="text-white text-sm font-bold truncate">${peerName}</h4>
+                                <span class="text-[10px] font-mono text-emerald-400">ID: ${peerId}</span>
+                            </div>
+                            <p class="text-xs text-slate-400 truncate tracking-wide">Click to open direct secure interface</p>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                    
+                    // Track dynamic online state changes live mapping for separate profiles variables structures loop maps
+                    onSnapshot(doc(db, "users", peerUid), (userSnap) => {
+                        if(userSnap.exists()){
+                            const u = userSnap.data();
+                            const ind = document.querySelector(`.indicator-${peerUid}`);
+                            if(ind) {
+                                if(u.statusState === "online") {
+                                    ind.classList.remove('bg-slate-500', 'bg-slate-600');
+                                    ind.classList.add('bg-emerald-500');
+                                } else {
+                                    ind.classList.remove('bg-emerald-500');
+                                    ind.classList.add('bg-slate-500');
+                                }
+                            }
+                        }
+                    });
+                });
+
+                // Attach selection bindings click handlers matrix logic 
+                document.querySelectorAll('.user-chat-row').forEach(row => {
+                    row.addEventListener('click', () => {
+                        const rId = row.getAttribute('data-room-id');
+                        const pUid = row.getAttribute('data-peer-uid');
+                        const pId = row.getAttribute('data-peer-id');
+                        const pName = row.getAttribute('data-peer-name');
+                        const pAvatar = row.getAttribute('data-peer-avatar');
+                        openChatRoomScope("private", rId, { uid: pUid, numericId: pId, username: pName, avatar: pAvatar });
+                    });
+                });
+            };
+
+            // Intercept multi-dimensional query schemas restrictions bindings arrays
+            let snapsA = [];
+            let snapsB = [];
+            onSnapshot(q1, (s) => { snapsA = s.docs.map(d=>d.data()); mergeAndRender(); });
+            onSnapshot(q2, (s) => { snapsB = s.docs.map(d=>d.data()); mergeAndRender(); });
+
+            function mergeAndRender() {
+                const combined = [...snapsA, ...snapsB];
+                // Unique filtering validation mappings configurations checking processes
+                const uniqueIds = new Set();
+                const uniqueArr = combined.filter(el => {
+                    if(!uniqueIds.has(el.roomId)) { uniqueIds.add(el.roomId); return true; }
+                    return false;
+                });
+                updateUI(uniqueArr);
+            }
+        }
+
+
+        // ==========================================
+        // COMMUNITY GROUP SPACES ENGINE CORE (GROUPS CODE SYSTEM)
+        // ==========================================
+        document.getElementById('btn-open-create-group').addEventListener('click', () => document.getElementById('modal-create-group').classList.remove('hidden'));
+        document.getElementById('btn-close-create').addEventListener('click', () => document.getElementById('modal-create-group').classList.add('hidden'));
+        document.getElementById('btn-open-join-group').addEventListener('click', () => document.getElementById('modal-join-group').classList.remove('hidden'));
+        document.getElementById('btn-close-join').addEventListener('click', () => document.getElementById('modal-join-group').classList.add('hidden'));
+
+        document.getElementById('btn-confirm-create-group').addEventListener('click', async () => {
+            const name = document.getElementById('input-group-name').value.trim();
+            if(!name) return alert("Please specify group identity configurations parameters titles clearly.");
+
+            try {
+                const code = generateGroupInviteCode();
+                const groupRoomId = "group_" + Date.now().toString();
+                const groupPayload = {
+                    roomId: groupRoomId,
+                    groupName: name,
+                    inviteCode: code,
+                    adminUid: currentUser.uid,
+                    adminId: myChatProfile.numericId,
+                    membersList: [myChatProfile.numericId],
+                    timestamp: Date.now()
+                };
+
+                await setDoc(doc(db, "groups", groupRoomId), groupPayload);
+                // Also track standard code rows directly maps records indexes arrays
+                await setDoc(doc(db, "groups_lookup", code), { roomId: groupRoomId });
+
+                alert(`Group Space Active! Invite Code: ${code}`);
+                document.getElementById('input-group-name').value = "";
+                document.getElementById('modal-create-group').classList.add('hidden');
+            } catch(err) {
+                alert("Error deploying cloud group spaces instances nodes profiles configurations: " + err.message);
+            }
+        });
+
+        document.getElementById('btn-confirm-join-group').addEventListener('click', async () => {
+            const code = document.getElementById('input-group-code').value.trim();
+            if(code.length !== 6) return alert("Please present correct 6-digit access parameters codes representations validation maps.");
+
+            try {
+                const codeLookup = await getDoc(doc(db, "groups_lookup", code));
+                if(!codeLookup.exists()) return alert("No active group match mapping definitions found inside system records data stacks.");
+
+                const rId = codeLookup.data().roomId;
+                const groupRef = doc(db, "groups", rId);
+                const groupSnap = await getDoc(groupRef);
+
+                if(groupSnap.exists()) {
+                    const groupData = groupSnap.data();
+                    if(groupData.membersList.includes(myChatProfile.numericId)) {
+                        document.getElementById('modal-join-group').classList.add('hidden');
+                        return alert("You are already indexed inside validation memberships arrays parameters for this target group.");
+                    }
+
+                    const updatedMembers = [...groupData.membersList, myChatProfile.numericId];
+                    await updateDoc(groupRef, { membersList: updatedMembers });
+
+                    alert(`Joined Group Space: ${groupData.groupName} Successfully!`);
+                    document.getElementById('input-group-code').value = "";
+                    document.getElementById('modal-join-group').classList.add('hidden');
+                }
+            } catch(err) {
+                alert("Error validating membership mappings: " + err.message);
+            }
+        });
+
+        function syncGroupsList() {
+            const container = document.getElementById('groups-list');
+            const q = query(collection(db, "groups"), where("membersList", "array-contains", myChatProfile.numericId));
+
+            onSnapshot(q, (snapshot) => {
+                container.innerHTML = "";
+                if(snapshot.empty) {
+                    container.innerHTML = '<p class="text-xs text-slate-600 italic text-center p-2">You haven\'t aggregated inside community group pipelines workspaces channels yet.</p>';
+                    return;
+                }
+                snapshot.forEach(docSnap => {
+                    const g = docSnap.data();
+                    const div = document.createElement('div');
+                    div.className = "p-3 bg-slate-900 hover:bg-slate-800 rounded-xl flex items-center justify-between cursor-pointer transition border border-slate-800/50 group-chat-row";
+                    div.setAttribute('data-room-id', g.roomId);
+                    div.setAttribute('data-group-name', g.groupName);
+                    div.setAttribute('data-invite-code', g.inviteCode);
+
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3 truncate">
+                            <div class="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white"><i class="fa-solid fa-users text-sm"></i></div>
+                            <div class="truncate">
+                                <h4 class="text-white text-xs font-bold truncate">${g.groupName}</h4>
+                                <span class="text-[10px] text-slate-500 font-mono block">Code: ${g.inviteCode}</span>
+                            </div>
+                        </div>
+                        <span class="bg-indigo-950 text-indigo-400 text-[9px] font-bold px-2 py-0.5 rounded-full">${g.membersList.length} Online Users</span>
+                    `;
+                    container.appendChild(div);
+                });
+
+                document.querySelectorAll('.group-chat-row').forEach(row => {
+                    row.addEventListener('click', () => {
+                        const rId = row.getAttribute('data-room-id');
+                        const gName = row.getAttribute('data-group-name');
+                        const iCode = row.getAttribute('data-invite-code');
+                        openChatRoomScope("group", rId, { groupName: gName, inviteCode: iCode });
+                    });
+                });
+            });
+        }
+
+
+        // ==========================================
+        // REAL-TIME MESSAGES FEED & SECURE PIPELINE SYSTEM
+        // ==========================================
+        async function openChatRoomScope(type, roomId, meta) {
+            if(unsubMessages) unsubMessages(); // Detach tracking logic loop parameters leaks safely 
+            
+            activeRoomId = roomId;
+            activeRoomType = type;
+            activeRoomData = meta;
+
+            document.getElementById('chat-window-placeholder').classList.add('hidden');
+            document.getElementById('chat-window-active').classList.remove('hidden');
+            
+            const avatarNode = document.getElementById('active-avatar');
+            const titleNode = document.getElementById('active-title');
+            const statusNode = document.getElementById('active-status');
+            const ageBadge = document.getElementById('active-age-badge');
+            const actionsNode = document.getElementById('active-meta-actions');
+            
+            ageBadge.classList.add('hidden');
+            actionsNode.innerHTML = "";
+
+            if(type === "private") {
+                avatarNode.className = "w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white text-lg font-bold";
+                avatarNode.innerHTML = getAvatarIcon(meta.avatar);
+                titleNode.innerText = meta.username;
+                
+                // Read exact live profile metrics configs entries matching data objects trees references arrays hooks
+                onSnapshot(doc(db, "users", meta.uid), (snap) => {
+                    if(snap.exists()){
+                        const profile = snap.data();
+                        statusNode.innerText = profile.statusState === "online" ? "Online" : "Last seen: " + profile.lastSeen;
+                        ageBadge.innerText = "Age: " + profile.age;
+                        ageBadge.classList.remove('hidden');
+                    }
+                });
+            } else {
+                // Config structural tracking rendering options parameters maps for global layout arrays items mapping loops sets
+                avatarNode.className = "w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white";
+                avatarNode.innerHTML = '<i class="fa-solid fa-users text-sm"></i>';
+                titleNode.innerText = meta.groupName;
+                statusNode.innerText = `Active Secure Channel Code: ${meta.inviteCode}`;
+                
+                // Track current target document state reference configuration arrays structures mappings entries 
+                const gSnap = await getDoc(doc(db, "groups", roomId));
+                if(gSnap.exists()) {
+                    const groupMeta = gSnap.data();
+                    if(groupMeta.adminId === myChatProfile.numericId) {
+                        actionsNode.innerHTML = `<button id="btn-purge-group" class="bg-rose-950 text-rose-400 font-bold px-2 py-1 rounded border border-rose-900 text-[10px] hover:bg-rose-900 hover:text-white transition">PURGE GROUP ROOM</button>`;
+                        setTimeout(() => {
+                            const btnPurge = document.getElementById('btn-purge-group');
+                            if(btnPurge) {
+                                btnPurge.addEventListener('click', async () => {
+                                    if(confirm("Confirm destructive operations rules execution? This completely clears the workspace metadata layer structures matching definitions maps.")) {
+                                        await deleteDoc(doc(db, "groups", roomId));
+                                        await deleteDoc(doc(db, "groups_lookup", meta.inviteCode));
+                                        document.getElementById('chat-window-active').classList.add('hidden');
+                                        document.getElementById('chat-window-placeholder').classList.remove('hidden');
+                                    }
+                                });
+                            }
+                        }, 100);
+                    }
+                }
+            }
+
+            // Sync dynamic streams queries pipeline mapping nodes arrays configurations execution sets loops
+            const msgQuery = query(collection(db, "rooms_vault", roomId, "messages"), orderBy("timestamp", "asc"));
+            
+            unsubMessages = onSnapshot(msgQuery, (snapshot) => {
+                const container = document.getElementById('messages-container');
+                container.innerHTML = "";
+                
+                if(snapshot.empty) {
+                    container.innerHTML = '<p class="text-xs text-slate-700 italic text-center p-8">End-to-End messaging matrix established securely. Transmission records array logs clear.</p>';
+                    return;
+                }
+
+                snapshot.forEach(docSnap => {
+                    const msg = docSnap.data();
+                    const isMe = msg.senderId === myChatProfile.numericId;
+                    
+                    const wrapper = document.createElement('div');
+                    wrapper.className = `flex w-full ${isMe ? 'justify-end' : 'justify-start'}`;
+
+                    let contentHtml = "";
+                    if(msg.type === "photo") {
+                        // Anti-Save Image Architecture Interface injection setup safely arrays objects layout patterns
+                        contentHtml = `
+                            <div class="relative bg-slate-900 p-1.5 rounded-2xl border border-slate-800 max-w-xs shadow-md">
+                                <div class="text-[10px] text-emerald-400 font-bold mb-1 px-1 flex justify-between items-center gap-4">
+                                    <span>${msg.senderName}</span>
+                                    <span class="bg-slate-950 text-slate-500 px-1.5 py-0.5 rounded text-[9px]"><i class="fa-solid fa-eye-slash mr-1"></i>ANTI-SAVE MEDIA</span>
+                                </div>
+                                <div class="relative rounded-xl overflow-hidden select-none" oncontextmenu="return false;">
+                                    <img src="${msg.mediaUrl}" class="w-full h-auto object-cover max-h-60 anti-save rounded-xl rounded-b-sm" alt="Protected Media Matrix Pipeline Asset">
+                                    <div class="absolute inset-0 bg-transparent z-40" oncontextmenu="return false;"></div>
+                                </div>
+                                <div class="text-[9px] text-slate-500 font-mono text-right mt-1 px-1">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                            </div>
+                        `;
+                    } else {
+                        // Default Standard Text Rendering layouts pipelines
+                        contentHtml = `
+                            <div class="p-3 max-w-xs md:max-w-md rounded-2xl shadow-md border ${isMe ? 'bg-emerald-600 text-slate-950 border-emerald-500 rounded-tr-none' : 'bg-slate-900 text-slate-200 border-slate-800 rounded-tl-none'}">
+                                <div class="text-[10px] font-bold ${isMe ? 'text-slate-900' : 'text-emerald-400'} mb-0.5 font-mono flex justify-between gap-6 items-center">
+                                    <span>@${msg.senderName}</span>
+                                    <span class="text-[9px] text-slate-500 opacity-80">${msg.senderAge ? 'Age: ' + msg.senderAge : ''}</span>
+                                </div>
+                                <p class="text-sm break-words leading-relaxed select-text tracking-wide">${msg.text}</p>
+                                <div class="text-[9px] text-right mt-1 opacity-60 font-mono">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                            </div>
+                        `;
+                    }
+
+                    wrapper.innerHTML = contentHtml;
+                    container.appendChild(wrapper);
+                });
+
+                // Auto Scroll to base edge calculations elements
+                container.scrollTop = container.scrollHeight;
+            });
+
+            // Handle typing status monitoring routines configurations initialization
+            syncTypingIndicatorsStream(roomId);
+        }
+
+        // Send Text Message Engine Action triggers execution matching definitions
+        document.getElementById('message-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const inputNode = document.getElementById('input-message');
+            const text = inputNode.value.trim();
+            if(!text || !activeRoomId) return;
+
+            inputNode.value = "";
+            clearTypingDatabaseHook();
+
+            try {
+                const payload = {
+                    type: "text",
+                    text: text,
+                    senderId: myChatProfile.numericId,
+                    senderName: myChatProfile.username,
+                    senderAge: myChatProfile.age,
+                    timestamp: Date.now()
+                };
+
+                await addDoc(collection(db, "rooms_vault", activeRoomId, "messages"), payload);
+            } catch(err) {
+                console.error("Message injection error mapping nodes tracking structures updates: ", err);
+            }
+        });
+
+        // Anti-Save Media Document Pipeline Dispatch Upload triggers actions
+        document.getElementById('input-photo').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if(!file || !activeRoomId) return;
+
+            try {
+                // Instant notification status placeholder text 
+                document.getElementById('input-message').placeholder = "Uploading encrypted asset streaming payloads nodes...";
+                
+                const assetKey = "secure_media_" + Date.now() + "_" + file.name;
+                const storageRef = ref(storage, `vault_nodes/${activeRoomId}/${assetKey}`);
+                
+                const uploadSnapshot = await uploadBytes(storageRef, file);
+                const secureUrl = await getDownloadURL(uploadSnapshot.ref);
+
+                const payload = {
+                    type: "photo",
+                    mediaUrl: secureUrl,
+                    senderId: myChatProfile.numericId,
+                    senderName: myChatProfile.username,
+                    senderAge: myChatProfile.age,
+                    timestamp: Date.now()
+                };
+
+                await addDoc(collection(db, "rooms_vault", activeRoomId, "messages"), payload);
+                document.getElementById('input-message').placeholder = "Type a secure message...";
+                e.target.value = ""; // Clear file fields array metrics
+            } catch(err) {
+                alert("Storage pipeline fault processing cryptographic content variables uploads: " + err.message);
+                document.getElementById('input-message').placeholder = "Type a secure message...";
+            }
+        });
+
+
+        // ==========================================
+        // REAL-TIME TYPING INDICATORS SYSTEM
+        // ==========================================
+        const inputMsgField = document.getElementById('input-message');
+        inputMsgField.addEventListener('input', () => {
+            if(!activeRoomId) return;
+            
+            // Write typing key row inside active room indicators tracking arrays namespaces
+            setDoc(doc(db, "rooms_vault", activeRoomId, "typing_registry", myChatProfile.numericId), {
+                username: myChatProfile.username,
+                isTyping: true,
+                expiresAt: Date.now() + 3000
+            });
+
+            // Debouncing timeout clearance execution mapping parameters configurations loops rules
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(clearTypingDatabaseHook, 2500);
+        });
+
+        async function clearTypingDatabaseHook() {
+            if(!activeRoomId) return;
+            await setDoc(doc(db, "rooms_vault", activeRoomId, "typing_registry", myChatProfile.numericId), {
+                isTyping: false
+            });
+        }
+
+        function syncTypingIndicatorsStream(roomId) {
+            const indicatorPanel = document.getElementById('typing-indicator');
+            const txtNode = document.getElementById('typing-text');
+            const q = query(collection(db, "rooms_vault", roomId, "typing_registry"), where("isTyping", "==", true));
+
+            onSnapshot(q, (snap) => {
+                let typers = [];
+                snap.forEach(d => {
+                    if(d.id !== myChatProfile.numericId) {
+                        typers.push(d.data().username);
+                    }
+                });
+
+                if(typers.length > 0) {
+                    txtNode.innerText = `${typers.join(', ')} ${typers.length === 1 ? 'is' : 'are'} typing secure data strings...`;
+                    indicatorPanel.classList.remove('hidden');
+                } else {
+                    indicatorPanel.classList.add('hidden');
+                }
+            });
+        }
+
+        // Absolute catch global window security layers block overrides variables structures definitions rules
+        window.addEventListener('keydown', (e) => {
+            // Mitigate default combinations capturing screenshots styles workflows mapping configurations lists keys
+            if (e.key === 'PrintScreen' || (e.ctrlKey && e.key === 'p')) {
+                e.preventDefault();
+                alert("Security policy alert: Native viewport parsing print streams mapping configurations are explicitly disabled inside MyChat workspaces.");
+            }
+        });
+    </script>
+</body>
+</html>
